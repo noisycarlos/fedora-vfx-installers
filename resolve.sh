@@ -12,7 +12,7 @@ fi
 version=$(echo ${installer_path} | sed -n 's/.\/DaVinci_Resolve_Studio_\([0-9.]*\)_Linux.run/\1/p')
 echo "--- Installing ${app_name} version ${version}..."
 
-sudo apt install libapr1 libaprutil1 libxcb-cursor0 libxcb-damage0
+sudo dnf install apr apr-util libxcb xcb-util-cursor xcb-util-damage
 sudo SKIP_PACKAGE_CHECK=1 ${installer_path} -i -y
 
 echo "--- Moving uneeded libraries..."

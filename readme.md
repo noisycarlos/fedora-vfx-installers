@@ -1,4 +1,4 @@
-# VFX Installers for Ubuntu #
+# VFX Installers for Fedora #
 
 This repository contains scripts to install Nuke, Resolve, and Fusion. These programs are commonly used in Visual Effects and post-production. However they're not particularly easy to install in Linux because they're not distributed as standard Linux installer files (deb, rpm, flatpak, etc).
 
@@ -39,7 +39,7 @@ If you get the following error:
 
 You need to install FUSE with the following command:
 
-``` sudo apt install libfuse2 -y ```
+``` sudo dnf install fuse fuse-libs -y ```
 
 
 The reason this is not done automatically in the script is because on one occasion installing FUSE misconfigured my desktop environment. I've installed it many times though, and only had that issue once. But I don't want someone to run the script, get their system bonked and not know what happened.
@@ -47,8 +47,7 @@ The reason this is not done automatically in the script is because on one occasi
 My system was fixed with the commands below, but just in case do a backup before you install FUSE:
 
 ```
-sudo apt purge gdm3
-sudo apt install gdm3
+sudo dnf reinstall gdm
 ```
 
 (solution from [askubuntu.com](https://askubuntu.com/questions/1525899/cannot-login-to-gui-on-ubuntu-24-04-after-installing-fuse) )
