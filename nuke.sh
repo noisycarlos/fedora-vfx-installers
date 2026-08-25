@@ -17,7 +17,7 @@ installation_dir_name=Nuke${version}
 vnum="${version%%v*}"
 
 echo "--- Installing libraries..."
-sudo dnf install mesa-libGL.x86_64 mesa-libGL-devel.x86_64 alsa-lib-devel.x86_64 libxkbcommon.x86_64 -y
+sudo dnf install mesa-libGL.x86_64 mesa-libGL-devel.x86_64 alsa-lib-devel.x86_64 libxkbcommon.x86_64 mesa-libGLU mesa-libGL-devel -y
 
 echo "--- Installing ${app_name} version ${version} - ${installer_path}..."
 echo "--- ${vnum} - ${installation_dir_name}"
