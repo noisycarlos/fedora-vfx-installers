@@ -50,24 +50,8 @@ fi
 
 sudo cp ./nuke.png ${nuke_install_basepath}/nuke.png
 
-echo "--- Installing ${app_name} version ${version} - ${installer_path}..."
-echo "--- ${vnum} - ${installation_dir_name}"
-
-sudo chmod +x ${installer_path}
-sudo ${installer_path} --accept-foundry-eula
-
-echo "--- Moving application to bin directory..."
-if [ ! -d "${nuke_install_basepath}" ]; then
-  sudo mkdir ${nuke_install_basepath} >/dev/null
-fi
-
-sudo rm -r ${nuke_install_basepath}/${installation_dir_name}
-sudo mv ./${installation_dir_name} ${nuke_install_basepath}/
-
-sudo cp ./nuke.png ${nuke_install_basepath}/nuke.png
-
-echo "--- Installing libraries..."
-sudo dnf install mesa-libGL.x86_64 mesa-libGL-devel.x86_64 alsa-lib-devel.x86_64 libxkbcommon.x86_64 mesa-libGLU mesa-libGL-devel -y
+echo "--- Installing dependencies..."
+sudo apt install libglu1-mesa libglu1-mesa-dev -y
 
 echo "--- Creating Application shortcuts..."
 sudo mkdir -p ~/.local/share/applications/
@@ -84,6 +68,7 @@ variations=(
 # Loop through each variation
 for variation in "${variations[@]}"; do
   IFS=':' read -r name flag <<<"$variation"
+  IFS=':' read -r name value <<<"$variation"
   shortcut_filename=$(echo "${name}_${version}" | tr -d ' .')
 
   echo "#!/usr/bin/env xdg-open
@@ -92,7 +77,7 @@ Version=1.0
 Terminal=false
 Type=Application
 Name=${name} ${version}
-Exec=${nuke_install_basepath}/${installation_dir_name}/Nuke${vnum} ${flag}
+Exec=${nuke_install_basepath}/${installation_dir_name}/Nuke${vnum} ${value}
 Icon=${nuke_install_basepath}/nuke.png" >${shortcut_filename}.desktop
 done
 
