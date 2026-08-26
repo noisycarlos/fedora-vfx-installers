@@ -1,23 +1,54 @@
 #!/bin/bash
 
 app_name="Nuke"
+installer_location=/home/$USER/Downloads
 
-# installer_path=$(find . -maxdepth 1 -type f -name 'Nuke*-linux-x86_64.run')
-installer_path=$(find . -maxdepth 1 -type f -name 'Nuke*-linux-x86_64.run' | sort -V | tail -n 1)
+installer_path_uncompressed=$(find $installer_location -maxdepth 1 -type f -name 'Nuke*-linux-x86_64.tgz' | sort -V | tail -n 1)
+installer_path=${installer_path_uncompressed%.tgz}.run
+installer_filename=${installer_path##*/}
+
+if [ -f "$installer_path_uncompressed" ] &&
+  [ ! -f "$installer_path" ]; then
+  echo "Uncompressing ${installer_path##*/}..."
+  tar -xzf $installer_path -C $installer_location
+fi
+
+if [ ! -f "$installer_path" ]; then
+  echo "--- Could not find .run file for tgz. Looking for any other .run file..."
+  installer_path=$(find $installer_location -maxdepth 1 -type f -name 'Nuke*-linux-x86_64.tgz' | sort -V | tail -n 1)
+fi
 
 if [ ! -f "$installer_path" ]; then
   echo "--- Skipping installation of ${app_name}, no installers found."
   exit 1
 fi
 
-version=$(echo ${installer_path} | sed -n 's/.\/Nuke\([0-9.v]*\)-linux-x86_64.run/\1/p')
+version=$(echo ${installer_filename} | sed -n 's/Nuke\([0-9.v]*\)-linux-x86_64.run/\1/p')
 
-nuke_install_basepath=/usr/bin/Nuke
+nuke_install_basepath=/opt/Nuke
 installation_dir_name=Nuke${version}
 vnum="${version%%v*}"
 
-echo "--- Installing libraries..."
-sudo dnf install mesa-libGL.x86_64 mesa-libGL-devel.x86_64 alsa-lib-devel.x86_64 libxkbcommon.x86_64 mesa-libGLU mesa-libGL-devel -y
+echo "--- Installing ${app_name} version ${version} - ${installer_filename}..."
+echo "--- ${vnum} - ${installation_dir_name}"
+
+# exit 0
+if [ -d ${nuke_install_basepath}/${installation_dir_name} ]; then
+  echo "--- Clearing destination..."
+  sudo rm -r ${nuke_install_basepath}/${installation_dir_name}
+fi
+
+sudo chmod +x ${installer_path}
+sudo ${installer_path} --accept-foundry-eula --prefix=${nuke_install_basepath}
+
+echo "--- Moving application to bin directory..."
+if [ ! -d "${nuke_install_basepath}" ]; then
+  sudo mkdir ${nuke_install_basepath} >/dev/null
+fi
+
+# sudo mv ./${installation_dir_name} ${nuke_install_basepath}/
+
+sudo cp ./nuke.png ${nuke_install_basepath}/nuke.png
 
 echo "--- Installing ${app_name} version ${version} - ${installer_path}..."
 echo "--- ${vnum} - ${installation_dir_name}"
@@ -34,6 +65,9 @@ sudo rm -r ${nuke_install_basepath}/${installation_dir_name}
 sudo mv ./${installation_dir_name} ${nuke_install_basepath}/
 
 sudo cp ./nuke.png ${nuke_install_basepath}/nuke.png
+
+echo "--- Installing libraries..."
+sudo dnf install mesa-libGL.x86_64 mesa-libGL-devel.x86_64 alsa-lib-devel.x86_64 libxkbcommon.x86_64 mesa-libGLU mesa-libGL-devel -y
 
 echo "--- Creating Application shortcuts..."
 sudo mkdir -p ~/.local/share/applications/
